@@ -2,11 +2,22 @@ const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const webpack = require('webpack');
+function resolve (dir) {
+    return path.join(__dirname, '..', dir)
+  }
+
 module.exports = {
     entry: {
-        main:'./app.js',
-        tabmain:'./tabmain.js'
+        main:'./src/index/index.js',
+        vendor: ['jquery']
     },
+    resolve: {
+        extensions: ['.js'],
+        alias: {
+          '@': resolve('src'),
+        }
+      },
     output: {
         path: path.join(__dirname, 'dist'),
         filename: '[name].js'
@@ -29,15 +40,15 @@ module.exports = {
               loader: 'html-loader'
             },
             {
-              test: /\.(png|jpg|gif)$/,
+              test: /\.(png|jpg|gif|woff2|woff|eot|svg|ttf)$/,
               use: [
                       {
                         loader: 'url-loader',
                         options: {
                             name: '[path][name][hash].[ext]',
                             outputPath: 'images/',
-                            limit:8192
-                            // publicPath: 'assets/'   //虚拟路径
+                            limit:8192,
+                            publicPath: '/'   //虚拟路径
                         }  
                       }
                     ]
@@ -47,16 +58,19 @@ module.exports = {
     plugins: [
         // new UglifyJSPlugin()
         new HtmlWebpackPlugin({
-             template:'index.ejs',
-             chunks:['main'],
+             template:'./src/index/index.ejs',
+             chunks:['vendor','main'],
              filename:'./index.html'
         }),
         new HtmlWebpackPlugin({
-             template:'tab.html',
-             chunks:['tabmain'],
-             filename:'./tab.html'
-        }),
+            template:'./src/teacher/list.ejs',
+            chunks:['vendor','main'],
+            filename:'./teacher/list.html'
+       }),
          new ExtractTextPlugin("[name][hash:8].css"),
+         new webpack.optimize.CommonsChunkPlugin({
+            names: ['vendor'],
+        }),
     ],
     devServer: {
         contentBase:'/dist',
