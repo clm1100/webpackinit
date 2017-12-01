@@ -80,6 +80,10 @@ module.exports = {
             filename: './login.html'
         }),
         new ExtractTextPlugin("[name][hash:8].css"),
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        }),
         new webpack.optimize.CommonsChunkPlugin({
             names: ['vendor'],
         }),
